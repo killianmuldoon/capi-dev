@@ -1,0 +1,37 @@
+Index: test/framework/clusterctl/clusterctl_helpers.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/test/framework/clusterctl/clusterctl_helpers.go b/test/framework/clusterctl/clusterctl_helpers.go
+--- a/test/framework/clusterctl/clusterctl_helpers.go	(revision Staged)
++++ b/test/framework/clusterctl/clusterctl_helpers.go	(date 1627549526946)
+@@ -18,9 +18,11 @@
+ 
+ import (
+ 	"context"
++	"fmt"
+ 	"io/ioutil"
+ 	"os"
+ 	"path/filepath"
++	"time"
+ 
+ 	. "github.com/onsi/gomega"
+ 
+@@ -150,8 +152,15 @@
+ 	})
+ 	Expect(workloadClusterTemplate).ToNot(BeNil(), "Failed to get the cluster template")
+ 
++	for i:=0; i<100; i++ {
++		err := input.ClusterProxy.Apply(ctx, workloadClusterTemplate)
++		if err == nil {
++			break
++		}
++		fmt.Printf("%s error applying template: %v", time.Now().String(), err)
++		time.Sleep(30 * time.Second)
++	}
+ 	log.Logf("Applying the cluster template yaml to the cluster")
+-	Expect(input.ClusterProxy.Apply(ctx, workloadClusterTemplate)).ShouldNot(HaveOccurred())
+ 
+ 	log.Logf("Waiting for the cluster infrastructure to be provisioned")
+ 	cluster := framework.DiscoveryAndWaitForCluster(ctx, framework.DiscoveryAndWaitForClusterInput{

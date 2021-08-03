@@ -1,4 +1,10 @@
 
+# MacOS
+
+When running unit tests debugging configurations, `panic`s sometimes lead to a stuck debugger. Workarounds:
+* Enable the `Go error breakpoint / Fatal error` breakpoint (in `View Breakpoint`)
+* Use run configurations to find the panic
+
 # main
 
 ## Patch: local controllers for Telepresence

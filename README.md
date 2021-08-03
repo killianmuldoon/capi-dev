@@ -1,17 +1,34 @@
+# Developing CAPI on MacOS
 
-# MacOS
+# Unit test panics
 
-When running unit tests debugging configurations, `panic`s sometimes lead to a stuck debugger. Workarounds:
+When running unit test debugging configurations, a `panic` sometimes leads to a stuck debugger. Solutions:
+
 * Enable the `Go error breakpoint / Fatal error` breakpoint (in `View Breakpoint`)
-* Use run configurations to find the panic
+* Use run configurations to find and fix the panic
 
-# main
+## Run envtest unit tests via kind
 
-## Patch: local controllers for Telepresence
+Patch `WebhookInstallOptions` in envtest so the kube-apiserver running in Docker for Mac can reach the webhooks running locally.
 
-Patches remote package to get kube-apiserver IP from Docker to be able to communicate with workload clusters. Telepresence must be used to get certificates and send webhook traffic to local controllers.
+Patch: [envtest-kind.patch](./patches/envtest-kind.patch)
 
-Patch: `local-controllers.patch`
+Create kind cluster via `kind create cluster` and run unit tests with env var: `USE_EXISTING_CLUSTER=true`
+
+# Run fake client unit tests without test env
+
+Go to the `TestMain` func of the `suite_test.go` file of the test package and insert the following at the top of the func:
+
+```go
+os.Exit(m.Run())
+```
+
+# Run local controllers including webhooks via Telepresence
+
+Patch remote package to get workload cluster kube-apiserver IPs from Docker to be able to communicate with workload clusters. Telepresence must be used to get certificates and send webhook traffic to
+local controllers.
+
+Patch: [local-controllers.patch](./patches/local-controllers.patch)
 
 Telepresence:
 
@@ -36,51 +53,31 @@ k -n ${controller}-system patch deployment ${controller}-controller-manager --ty
 telepresence uninstall --everything
 ```
 
-## Patch: local controllers (including self gen certificates)
+Run controllers with: `--webhook-cert-dir=${HOME}/telepresence/${controller}-controller/volumes/tmp/k8s-webhook-server/serving-certs/`
 
-Generate webhook certs if missing. Patches remote package to get kube-apiserver IP from Docker to be able to communicate with workload clusters. Controllers in cluster have to keep running to serve webhooks.
+# Run local controllers without webhooks
 
-Patch: `local-controllers-self-gen-certs.patch`
+The patched code generates webhook certs if missing (so the controller is able to start). Also patches remote package to get a workload cluster kube-apiserver IP from Docker to be able to communicate
+with workload clusters. Controllers in cluster have to keep running to serve webhooks (Note: this means the controllers are running twice, which can lead to unintended side effects).
+
+Patch: [local-controllers-self-gen-certs.patch](./patches/local-controllers-self-gen-certs.patch)
 
 ```bash
 kind get kubeconfig --name=$(kind get clusters | grep test) | k8s-ctx-import; kctx kind-$(kind get clusters | grep test)
 ```
 
-## Patch: envtest with kind
+Run controllers with: `--leader-elect=false`
 
-Patches `WebhookInstallOptions` so the kube-apiserver running in Docker for Mac can reach the webhooks running locally.
+## Retry e2e test apply
 
-Patch: `envtest-kind.patch`
+Sometimes webhooks are not available in time. This patch retries apply until the webhooks are ready.
 
-## Patch: retry e2e test apply
-
-Webhooks are not available in time. This patch just retries apply until the webhooks are ready.
-
-Patch: `e2e-test-retry.patch`
+Patch: [e2e-test-retry.patch](./patches/e2e-test-retry.patch)
+Patch: [0.3-e2e-test-retry.patch](./patches/0.3-e2e-test-retry.patch) (for release-0.3 branch)
 
 ## Prepare e2e
 
-Build images and generate templates.
-
-```bash
-make docker-build
-make -C test/infrastructure/docker docker-build
-
-make -C test/e2e cluster-templates
-```
-
-
-# v0.3
-
-## Patch: retry e2e test apply
-
-Webhooks are not available in time. This patch just retries apply until the webhooks are ready.
-
-Patch: `0.3-e2e-test-retry.patch`
-
-## Prepare e2e
-
-Build images and generate templates.
+Excute the following to build e2e images and generate templates.
 
 ```bash
 make docker-build

@@ -73,11 +73,12 @@ Run controllers with: `--leader-elect=false`
 Sometimes webhooks are not available in time. This patch retries apply until the webhooks are ready.
 
 Patch: [e2e-test-retry.patch](./patches/e2e-test-retry.patch)
+
 Patch: [0.3-e2e-test-retry.patch](./patches/0.3-e2e-test-retry.patch) (for release-0.3 branch)
 
-## Prepare e2e
+## Prepare e2e test
 
-Excute the following to build e2e images and generate templates.
+Execute the following to build e2e images and generate templates before running e2e tests via the IDE:
 
 ```bash
 make docker-build

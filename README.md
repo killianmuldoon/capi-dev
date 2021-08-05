@@ -81,8 +81,22 @@ Patch: [0.3-e2e-test-retry.patch](./patches/0.3-e2e-test-retry.patch) (for relea
 Execute the following to build e2e images and generate templates before running e2e tests via the IDE:
 
 ```bash
+export REGISTRY=gcr.io/k8s-staging-cluster-api
+export TAG=dev
+export ARCH=amd64
+export PULL_POLICY=IfNotPresent
+  
 make docker-build
 make -C test/infrastructure/docker docker-build
 
 make -C test/e2e cluster-templates
+```
+
+For upgrade tests:
+
+```bash
+source $CAPI_HOME/scripts/ci-e2e-lib.sh
+# e.g.:
+k8s::resolveVersion KUBERNETES_VERSION ci/latest-1.22
+kind::prepareKindestImage "$resolveVersion"
 ```

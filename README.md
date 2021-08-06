@@ -37,18 +37,15 @@ Telepresence:
 kind get kubeconfig --name=$(kind get clusters | grep test) | k8s-ctx-import; kctx kind-$(kind get clusters | grep test)
 # Intercept webhook service (capi, capd, capi-kubeadm-bootstrap, capi-kubeadm-control-plane, capo, capv, capz)
 controller=capi
-telepresence intercept -n ${controller}-system ${controller}-controller-manager --port 9443 --env-file /tmp/local-controller-env --mount "${HOME}/telepresence/${controller}-controller/volumes"
+telepresence connect #TODO test without (right patch order)
 # Disable manager
-k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "remove", "path": "/spec/template/spec/containers/0/readinessProbe"}]'
-k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "remove", "path": "/spec/template/spec/containers/0/livenessProbe"}]'
-k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "replace", "value": "k8s.gcr.io/pause:3.5", "path": "/spec/template/spec/containers/0/image"}]'
-k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "replace", "value": ["/pause"], "path": "/spec/template/spec/containers/0/command"}]'
+k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "remove", "path": "/spec/template/spec/containers/0/readinessProbe"},{"op": "remove", "path": "/spec/template/spec/containers/0/livenessProbe"},{"op": "replace", "value": "k8s.gcr.io/pause:3.5", "path": "/spec/template/spec/containers/0/image"},{"op": "replace", "value": ["/pause"], "path": "/spec/template/spec/containers/0/command"}]'
+telepresence intercept -n ${controller}-system ${controller}-controller-manager --port 9443 --env-file /tmp/local-controller-env --mount "${HOME}/telepresence/${controller}-controller/volumes"
 
 # Un-intercept webhook service
 telepresence uninstall -n ${controller}-system --agent ${controller}-controller-manager
 # Enable manager (Note: image must be adjusted)
-k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "replace", "value": "gcr.io/k8s-staging-cluster-api/cluster-api-controller:master", "path": "/spec/template/spec/containers/0/image"}]'
-k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "replace", "value": ["/manager"], "path": "/spec/template/spec/containers/0/command"}]'
+k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "replace", "value": "gcr.io/k8s-staging-cluster-api/cluster-api-controller:master", "path": "/spec/template/spec/containers/0/image"},{"op": "replace", "value": ["/manager"], "path": "/spec/template/spec/containers/0/command"}]'
 # Remove telepresence traffic-manager
 telepresence uninstall --everything
 ```

@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="capo conformance fast" type="GoTestRunConfiguration" factoryName="Go Test" folderName="CAPO">
+    <module name="cluster-api-provider-openstack" />
+    <working_directory value="$PROJECT_DIR$/cluster-api-provider-openstack/test/e2e/suites/conformance" />
+    <parameters value="-config-path=&quot;$PROJECT_DIR$/cluster-api-provider-openstack/test/e2e/data/e2e_conf.yaml&quot; -artifacts-folder=&quot;$PROJECT_DIR$/cluster-api-provider-openstack/_artifacts&quot; -data-folder=&quot;$PROJECT_DIR$/cluster-api-provider-openstack/test/e2e/data&quot; -kubetest.config-file=$PROJECT_DIR$/cluster-api-provider-openstack/test/e2e/data/kubetest/conformance-fast.yaml -kubetest.ginkgo-nodes=5 -use-existing-cluster=true -ginkgo.v=true" />
+    <kind value="PACKAGE" />
+    <package value="sigs.k8s.io/cluster-api-provider-openstack/test/e2e/suites/conformance" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <framework value="gotest" />
+    <pattern value="^\QTestConformance\E$" />
+    <method v="2" />
+  </configuration>
+</component>

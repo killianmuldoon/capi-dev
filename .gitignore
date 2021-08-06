@@ -1,1 +1,6 @@
+# exclude all in .idea except runConfigurations
+!.idea/
+.idea/*
+!.idea/runConfigurations/
+
 tmp

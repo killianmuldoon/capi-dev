@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="clusterctl init" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="clusterctl">
+    <module name="cluster-api" />
+    <working_directory value="$PROJECT_DIR$/../cluster-api" />
+    <parameters value="init --infrastructure docker" />
+    <kind value="PACKAGE" />
+    <package value="sigs.k8s.io/cluster-api/cmd/clusterctl" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cluster-api/cmd/clusterctl/main.go" />
+    <method v="2" />
+  </configuration>
+</component>

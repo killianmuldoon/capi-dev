@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test_dumpOpenStackClusters in sigs.k8s.io/cluster-api-provider-openstack/test/e2e/shared" type="GoTestRunConfiguration" factoryName="Go Test" folderName="CAPO" nameIsGenerated="true">
+    <module name="cluster-api-provider-openstack" />
+    <working_directory value="$PROJECT_DIR$/cluster-api-provider-openstack/test/e2e/shared" />
+    <kind value="PACKAGE" />
+    <package value="sigs.k8s.io/cluster-api-provider-openstack/test/e2e/shared" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <framework value="gotest" />
+    <pattern value="^\QTest_dumpOpenStackClusters\E$" />
+    <method v="2" />
+  </configuration>
+</component>

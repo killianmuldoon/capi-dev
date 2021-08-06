@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="tele: capi-controller" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="CAPI">
+  <configuration default="false" name="tele: capi controller" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="CAPI">
     <module name="cluster-api" />
     <working_directory value="$PROJECT_DIR$/../cluster-api" />
     <parameters value="--webhook-cert-dir=$USER_HOME$/telepresence/capi-controller/volumes/tmp/k8s-webhook-server/serving-certs/" />

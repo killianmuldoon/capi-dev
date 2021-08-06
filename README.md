@@ -33,11 +33,12 @@ Patch: [local-controllers.patch](./patches/local-controllers.patch)
 Telepresence:
 
 ```bash
+# TODO: complete cleanup before: telepresence uninstall --everything + quit
 # Import kubeconfig
 kind get kubeconfig --name=$(kind get clusters | grep test) | k8s-ctx-import; kctx kind-$(kind get clusters | grep test)
 # Intercept webhook service (capi, capd, capi-kubeadm-bootstrap, capi-kubeadm-control-plane, capo, capv, capz)
 controller=capi
-telepresence connect #TODO test without (right patch order)
+telepresence connect
 # Disable manager
 k -n ${controller}-system patch deployment ${controller}-controller-manager --type json -p='[{"op": "remove", "path": "/spec/template/spec/containers/0/readinessProbe"},{"op": "remove", "path": "/spec/template/spec/containers/0/livenessProbe"},{"op": "replace", "value": "k8s.gcr.io/pause:3.5", "path": "/spec/template/spec/containers/0/image"},{"op": "replace", "value": ["/pause"], "path": "/spec/template/spec/containers/0/command"}]'
 telepresence intercept -n ${controller}-system ${controller}-controller-manager --port 9443 --env-file /tmp/local-controller-env --mount "${HOME}/telepresence/${controller}-controller/volumes"
@@ -82,7 +83,7 @@ export REGISTRY=gcr.io/k8s-staging-cluster-api
 export TAG=dev
 export ARCH=amd64
 export PULL_POLICY=IfNotPresent
-  
+
 make docker-build
 make -C test/infrastructure/docker docker-build
 

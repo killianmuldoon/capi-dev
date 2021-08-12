@@ -2,7 +2,7 @@
   <configuration default="false" name="ctrl-only: capi controller" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="CAPI">
     <module name="cluster-api" />
     <working_directory value="$PROJECT_DIR$/../cluster-api" />
-    <parameters value="--leader-elect=false  --webhook-cert-dir=/tmp/k8s-webhook-server-capi/" />
+    <parameters value="--leader-elect=false  --webhook-cert-dir=/tmp/k8s-webhook-server-capi/ --feature-gates=MachinePool=true,ClusterResourceSet=true,ClusterTopology=true" />
     <kind value="PACKAGE" />
     <package value="sigs.k8s.io/cluster-api" />
     <directory value="$PROJECT_DIR$" />

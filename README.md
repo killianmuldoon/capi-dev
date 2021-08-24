@@ -7,22 +7,6 @@ When running unit test debugging configurations, a `panic` sometimes leads to a 
 * Enable the `Go error breakpoint / Fatal error` breakpoint (in `View Breakpoint`)
 * Use run configurations to find and fix the panic
 
-## Run envtest unit tests via kind
-
-Patch `WebhookInstallOptions` in envtest so the kube-apiserver running in Docker for Mac can reach the webhooks running locally.
-
-Patch: [envtest-kind.patch](./patches/envtest-kind.patch)
-
-Create kind cluster via `kind create cluster` and run unit tests with env var: `USE_EXISTING_CLUSTER=true`
-
-# Run fake client unit tests without test env
-
-Go to the `TestMain` func of the `suite_test.go` file of the test package and insert the following at the top of the func:
-
-```go
-os.Exit(m.Run())
-```
-
 # Run local controllers including webhooks via Telepresence
 
 Patch remote package to get workload cluster kube-apiserver IPs from Docker to be able to communicate with workload clusters. Telepresence must be used to get certificates and send webhook traffic to
@@ -73,6 +57,8 @@ Sometimes webhooks are not available in time. This patch retries apply until the
 Patch: [e2e-test-retry.patch](./patches/e2e-test-retry.patch)
 
 Patch: [0.3-e2e-test-retry.patch](./patches/0.3-e2e-test-retry.patch) (for release-0.3 branch)
+
+Note: I didn't had this issue the last view weeks, so it maybe has been fixed somehow (I had it very frequently before).
 
 ## Prepare e2e test
 

@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="capi e2e: clusterctl upgrade" type="GoTestRunConfiguration" factoryName="Go Test" folderName="test/e2e">
+    <module name="cluster-api" />
+    <working_directory value="$PROJECT_DIR$/../cluster-api/test/e2e" />
+    <parameters value="-e2e.config=$PROJECT_DIR$/../cluster-api/test/e2e/config/docker.yaml -ginkgo.focus=&quot;Should create a management cluster and then upgrade all the providers&quot; -ginkgo.v=true" />
+    <envs>
+      <env name="ARTIFACTS" value="$PROJECT_DIR$/../cluster-api/_artifacts" />
+      <env name="ETCD_VERSION_UPGRADE_TO" value="3.4.13-0" />
+      <env name="COREDNS_VERSION_UPGRADE_TO" value="v1.8.4" />
+      <env name="KUBERNETES_VERSION_UPGRADE_FROM" value="v1.21.2" />
+      <env name="KUBERNETES_VERSION_UPGRADE_TO" value="v1.22.0-beta.1.149+789662889b14f3" />
+    </envs>
+    <kind value="PACKAGE" />
+    <package value="sigs.k8s.io/cluster-api/test/e2e" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <framework value="gotest" />
+    <pattern value="^\QTestE2E\E$" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="capi e2e quickstart" type="GoTestRunConfiguration" factoryName="Go Test" folderName="test/e2e">
+  <configuration default="false" name="capi e2e: quickstart" type="GoTestRunConfiguration" factoryName="Go Test" folderName="test/e2e">
     <module name="cluster-api" />
     <working_directory value="$PROJECT_DIR$/../cluster-api/test/e2e" />
     <parameters value="-e2e.config=$PROJECT_DIR$/../cluster-api/test/e2e/config/docker.yaml -ginkgo.focus=&quot;\[PR-Blocking\]&quot; -ginkgo.v=true" />

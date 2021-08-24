@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="capi e2e: self-hosted" type="GoTestRunConfiguration" factoryName="Go Test" folderName="test/e2e">
+    <module name="cluster-api" />
+    <working_directory value="$PROJECT_DIR$/../cluster-api/test/e2e" />
+    <parameters value="-e2e.config=$PROJECT_DIR$/../cluster-api/test/e2e/config/docker.yaml -ginkgo.focus=&quot;self-hosted&quot; -ginkgo.v=true" />
+    <envs>
+      <env name="ARTIFACTS" value="$PROJECT_DIR$/../cluster-api/_artifacts" />
+    </envs>
+    <kind value="PACKAGE" />
+    <package value="sigs.k8s.io/cluster-api/test/e2e" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$" />
+    <framework value="gotest" />
+    <pattern value="^\QTestE2E\E$" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -19,7 +19,7 @@ Telepresence:
 ```bash
 # TODO: complete cleanup before: telepresence uninstall --everything + quit
 # Import kubeconfig
-kind get kubeconfig --name=$(kind get clusters | grep test) | k8s-ctx-import; kctx kind-$(kind get clusters | grep test)
+kind_kubeconfig test-<tab>
 # Intercept webhook service (capi, capd, capi-kubeadm-bootstrap, capi-kubeadm-control-plane, capo, capv, capz)
 controller=capi
 telepresence connect

@@ -45,11 +45,11 @@ TODO:
 * webhook currently forbids all changes to ClusterClass refs, not only incompatible ones
 * rolloutAfter is there but isn't implemented yet
 
-# Nits
+# Issues
 
 * [we do delete MachineDeployment templates to soon](https://vmware.slack.com/archives/C02940RMBD3/p1629989630007600)
 * [what's the goal with label/annotations](https://vmware.slack.com/archives/C02940RMBD3/p1629984540004900)
-  * Bug: don't propogate down to machines
+  * Bug: doesn't propagate down to machines
 
 # Findings    
 

@@ -13,3 +13,5 @@ spec:
   topology:
     class: my-cluster-class
     version: v1.22.0
+    controlPlane:
+      metadata: {}

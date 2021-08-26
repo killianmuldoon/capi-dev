@@ -26,14 +26,19 @@ k apply -f ./base/cluster.yaml
   * change topology fields (cluster-3.yaml)
     * add workers
     * workers: scale up / scale down
-    * workers: change labels/annotations (to test rotation) (ERROR)
+    * workers: change labels/annotations (to test rotation) (ERROR see below)
   * change clusterclass fields:
     * change a label/annotation which is overwritten in the topology and shouldn't trigger a rotation
   * change topology fields
     * workers: delete (cluster-4.yaml)
   * delete cluster
 
-* > Same with errors?
+TODO:
+* Check if MD templates are deleted after MD deletion (probably not)
+* Same with errors?
+* ClusterClass updates:
+    * ref changes
+* ClusterClass rebase
 
 # Tasks
 
@@ -46,15 +51,6 @@ k apply -f ./base/cluster.yaml
 * [what's the goal with label/annotations](https://vmware.slack.com/archives/C02940RMBD3/p1629984540004900)
   * Bug: don't propogate down to machines
 
-* PR:
-  * controlPlaneInfrastructureMachineTemplateNamePrefix: controlplane => control-plane to keep it consistent with our current templates / naming?
-  * Cluster.spec.topology.controlPlane is required (only in OpenAPI Schema), should it be?
-    * This only affects kubectl. With validate=false the Cluster can be created and results in:
-      ```yaml
-      controlPlane:
-        metadata: {}
-      ```
-
 # Findings    
 
 * controlPlane machineInfrastructure must be set twice (ClusterClass + KubeadmControlPlaneTemplate)
@@ -64,4 +60,3 @@ k apply -f ./base/cluster.yaml
     * Might be good to add an additional check (i.e. check if they already exist?) during reconcile (in addition to improving our cleanup behaviour on errors (which is already planned))
 
 * We could block ClusterClass deletion via webhook as long as it's used in Clusters
-

@@ -19,6 +19,7 @@ k apply -f ./base/cluster.yaml
   * create basic setup (cluster.yaml + clusterclass.yaml)
   * change topology fields (cluster-2.yaml)
     * control plane: add labels/annotations (to test rotation)
+      * [BUG: labels/annotations are not propogated to machines (for workers as well)](https://vmware.slack.com/archives/C02940RMBD3/p1629984540004900)
     * control plane: scale up / scale down
   * change clusterclass fields: (clusterclass-2.yaml)
     * add workers
@@ -26,7 +27,8 @@ k apply -f ./base/cluster.yaml
   * change topology fields (cluster-3.yaml)
     * add workers
     * workers: scale up / scale down
-    * workers: change labels/annotations (to test rotation) (ERROR see below)
+    * workers: change labels/annotations (to test rotation)
+      * [BUG: MachineDeployment rollout is broken, because we delete templates to soon](https://vmware.slack.com/archives/C02940RMBD3/p1629989630007600)
   * change clusterclass fields:
     * change a label/annotation which is overwritten in the topology and shouldn't trigger a rotation
   * change topology fields
@@ -46,10 +48,6 @@ TODO:
 * rolloutAfter is there but isn't implemented yet
 
 # Issues
-
-* [we do delete MachineDeployment templates to soon](https://vmware.slack.com/archives/C02940RMBD3/p1629989630007600)
-* [what's the goal with label/annotations](https://vmware.slack.com/archives/C02940RMBD3/p1629984540004900)
-  * Bug: doesn't propagate down to machines
 
 # Findings    
 

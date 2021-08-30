@@ -3,6 +3,9 @@
     <module name="cluster-api" />
     <working_directory value="$PROJECT_DIR$/../cluster-api/test/infrastructure/docker" />
     <parameters value="--webhook-cert-dir=$USER_HOME$/telepresence/capd-controller/volumes/tmp/k8s-webhook-server/serving-certs/ --feature-gates=ClusterTopology=true,MachinePool=true --leader-elect=false" />
+    <envs>
+      <env name="CAPI_MAC_FIX_REST_CONFIG" value="true" />
+    </envs>
     <kind value="PACKAGE" />
     <package value="sigs.k8s.io/cluster-api/test/infrastructure/docker" />
     <directory value="$PROJECT_DIR$" />

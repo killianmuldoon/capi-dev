@@ -3,6 +3,9 @@
     <module name="cluster-api" />
     <working_directory value="$PROJECT_DIR$/../cluster-api" />
     <parameters value="--leader-elect=false --webhook-cert-dir=/tmp/k8s-webhook-server-kcp/ --feature-gates=ClusterTopology=true" />
+    <envs>
+      <env name="CAPI_MAC_FIX_REST_CONFIG" value="true" />
+    </envs>
     <kind value="PACKAGE" />
     <package value="sigs.k8s.io/cluster-api/controlplane/kubeadm" />
     <directory value="$PROJECT_DIR$" />

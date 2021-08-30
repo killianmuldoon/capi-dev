@@ -7,3 +7,8 @@ spec:
     class: my-cluster-class
     version: v1.22.0
     controlPlane: {}
+    workers:
+      machineDeployments:
+      - class: default-worker
+        name: default-worker
+        replicas: 3

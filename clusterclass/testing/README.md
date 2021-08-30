@@ -39,6 +39,7 @@ k apply -f ./base/cluster-1.yaml
 TODO:
 * Check if MD templates are deleted after MD deletion (probably not)
 * KCP: check if kubernetesVersion and machineTemplate must be set
+* multiple clusters
 * Same with errors?
 * ClusterClass updates:
     * ref changes

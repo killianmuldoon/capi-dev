@@ -30,36 +30,16 @@ spec:
   - name: my-inline-patch1
     definitions:
     - target:
-        # https://github.com/kubernetes-sigs/kustomize/blob/master/examples/patchMultipleObjects.md
         apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
         kind: KubeadmConfigTemplate
-        # 3 options for selector:
-        # 1.
-        match:
-          controlPlane: true/false
-          infrastructure: true/false
-          machineDeployments: # do we want a "match all" ? - "*" vs - "" (https://kubernetes.io/docs/concepts/services-networking/network-policies/#default-allow-all-egress-traffic)
-          - windows-worker
-          - "*"
-          - ""
-        # 2.
         selector:
-          controlPlane: true/false
-          infrastructure: true/false
-          machineDeployments: # do we want a "match all" ? - "*" vs - "" (https://kubernetes.io/docs/concepts/services-networking/network-policies/#default-allow-all-egress-traffic)
-          - windows-worker
-          - "*"
-          - ""
-        # 3.
-        selector:
-          matchControlPlane: true/false
-          matchInfrastructure: true/false
-          matchMachineDeployments: # do we want a "match all" ? - "*" vs - "" (https://kubernetes.io/docs/concepts/services-networking/network-policies/#default-allow-all-egress-traffic)
-          - windows-worker
-          - "*"
-          - ""
+          matchResources:
+            controlPlane: true
+            machineDeploymentClass:
+              names:
+              - windows-worker
       jsonPatches:
-      - op: "replace"
+      - op: "replace" # add, replace or remove
         path: "/spec/cpus"
         # one of value or valueFrom
         value: 1

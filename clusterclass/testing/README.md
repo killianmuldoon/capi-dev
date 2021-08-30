@@ -11,12 +11,12 @@ Branch: `poc-clusterclass-manual-testing`
 Base:
 
 ```bash
-k apply -f ./base/clusterclass.yaml
-k apply -f ./base/cluster.yaml
+k apply -f ./base/clusterclass-1.yaml
+k apply -f ./base/cluster-1.yaml
 ```
 
 * Basic testcase:
-  * create basic setup (cluster.yaml + clusterclass.yaml)
+  * create basic setup (cluster-1.yaml + clusterclass-1.yaml)
   * change topology fields (cluster-2.yaml)
     * control plane: add labels/annotations (to test rotation)
       * [ClusterClass: Topology metadata is not propagated to machines #5168](https://github.com/kubernetes-sigs/cluster-api/issues/5168)
@@ -38,6 +38,7 @@ k apply -f ./base/cluster.yaml
 
 TODO:
 * Check if MD templates are deleted after MD deletion (probably not)
+* KCP: check if kubernetesVersion and machineTemplate must be set
 * Same with errors?
 * ClusterClass updates:
     * ref changes

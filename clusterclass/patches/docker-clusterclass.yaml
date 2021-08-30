@@ -2,67 +2,49 @@ apiVersion: cluster.x-k8s.io/v1alpha4
 kind: ClusterClass
 metadata:
   name: my-cluster-class
-  namespace: default
 spec:
   controlPlane:
     ref:
       apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
       kind: KubeadmControlPlaneTemplate
-      name: default
-      namespace: default
+      name: my-cluster-class-control-plane
   infrastructure:
     ref:
       apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
       kind: DockerClusterTemplate
-      name: default
-      namespace: default
-  variables:
-    definitions:
-    - name: location
-      required: true
-      schema:
-        openAPIV3Schema:
-          type: string
-    - name: defaultString
-      required: true
-      schema:
-        openAPIV3Schema:
-          type: string
-          default: defaultStringValue
+      name: my-cluster-class-cluster
+  workers:
+    machineDeployments:
+    - class: default-worker
+      template:
+        bootstrap:
+          ref:
+            kind: KubeadmConfigTemplate
+            apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
+            name: my-cluster-class-md-0
+        infrastructure:
+          ref:
+            kind: AWSMachineTemplate
+            apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+            name: my-cluster-class-md-0
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
 kind: DockerClusterTemplate
 metadata:
-  name: my-cluster
-  namespace: default
+  name: my-cluster-class-cluster
 ---
-apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
-kind: DockerMachineTemplate
-metadata:
-  name: "my-cluster-control-plane"
-  namespace: default
-spec:
-  template:
-    spec:
-      extraMounts:
-      - containerPath: "/var/run/docker.sock"
-        hostPath: "/var/run/docker.sock"
----
-kind: KubeadmControlPlaneTemplate
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
+kind: KubeadmControlPlaneTemplate
 metadata:
-  name: "my-cluster-control-plane"
-  namespace: default
+  name: my-cluster-class-control-plane
 spec:
   template:
     spec:
-      replicas: 1
       machineTemplate:
         infrastructureRef:
           kind: DockerMachineTemplate
           apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
-          name: "my-cluster-control-plane"
-          namespace: default
+          name: "my-cluster-class-control-plane"
       kubeadmConfigSpec:
         clusterConfiguration:
           controllerManager:
@@ -90,17 +72,26 @@ spec:
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
 kind: DockerMachineTemplate
 metadata:
-  name: "my-cluster-md-0"
-  namespace: default
+  name: my-cluster-class-control-plane
 spec:
   template:
-    spec: { }
+    spec:
+      extraMounts:
+      - containerPath: "/var/run/docker.sock"
+        hostPath: "/var/run/docker.sock"
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+kind: DockerMachineTemplate
+metadata:
+  name: my-cluster-class-md-0
+spec:
+  template:
+    spec: {}
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
 kind: KubeadmConfigTemplate
 metadata:
-  name: "my-cluster-md-0"
-  namespace: default
+  name: my-cluster-class-md-0
 spec:
   template:
     spec:

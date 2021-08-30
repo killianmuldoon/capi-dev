@@ -1,0 +1,149 @@
+apiVersion: cluster.x-k8s.io/v1alpha4
+kind: ClusterClass
+metadata:
+  name: my-cluster-class
+spec:
+  controlPlane:
+    ref:
+      apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
+      kind: KubeadmControlPlaneTemplate
+      name: my-cluster-class-control-plane
+  infrastructure:
+    ref:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+      kind: DockerClusterTemplate
+      name: my-cluster-class-cluster
+  variables:
+    definitions:
+    - name: location
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: defaultString
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+          default: defaultStringValue
+  patches:
+  - name: my-inline-patch1
+    definitions:
+    - target:
+        # https://github.com/kubernetes-sigs/kustomize/blob/master/examples/patchMultipleObjects.md
+        apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
+        kind: KubeadmConfigTemplate
+        # 3 options for selector:
+        # 1.
+        match:
+          controlPlane: true/false
+          infrastructure: true/false
+          machineDeployments: # do we want a "match all" ? - "*" vs - "" (https://kubernetes.io/docs/concepts/services-networking/network-policies/#default-allow-all-egress-traffic)
+          - windows-worker
+          - "*"
+          - ""
+        # 2.
+        selector:
+          controlPlane: true/false
+          infrastructure: true/false
+          machineDeployments: # do we want a "match all" ? - "*" vs - "" (https://kubernetes.io/docs/concepts/services-networking/network-policies/#default-allow-all-egress-traffic)
+          - windows-worker
+          - "*"
+          - ""
+        # 3.
+        selector:
+          matchControlPlane: true/false
+          matchInfrastructure: true/false
+          matchMachineDeployments: # do we want a "match all" ? - "*" vs - "" (https://kubernetes.io/docs/concepts/services-networking/network-policies/#default-allow-all-egress-traffic)
+          - windows-worker
+          - "*"
+          - ""
+      jsonPatches:
+      - op: "replace"
+        path: "/spec/cpus"
+        # one of value or valueFrom
+        value: 1
+        valueFrom:
+          # one of variable or template
+          variable: cpu
+          template: |
+            {{ builtin.cluster.name }}
+
+
+
+
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+kind: DockerClusterTemplate
+metadata:
+  name: my-cluster-class-cluster
+---
+kind: KubeadmControlPlaneTemplate
+apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
+metadata:
+  name: "my-cluster-class-control-plane"
+spec:
+  template:
+    spec:
+      machineTemplate:
+        infrastructureRef:
+          kind: DockerMachineTemplate
+          apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+          name: "my-cluster-class-control-plane"
+      kubeadmConfigSpec:
+        clusterConfiguration:
+          controllerManager:
+            extraArgs: { enable-hostpath-provisioner: 'true' }
+          apiServer:
+            certSANs: [ localhost, 127.0.0.1 ]
+        initConfiguration:
+          nodeRegistration:
+            criSocket: /var/run/containerd/containerd.sock
+            kubeletExtraArgs:
+              # We have to pin the cgroupDriver to cgroupfs as kubeadm >=1.21 defaults to systemd
+              # kind will implement systemd support in: https://github.com/kubernetes-sigs/kind/issues/1726
+              cgroup-driver: cgroupfs
+              eviction-hard: 'nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%'
+        joinConfiguration:
+          nodeRegistration:
+            criSocket: /var/run/containerd/containerd.sock
+            kubeletExtraArgs:
+              # We have to pin the cgroupDriver to cgroupfs as kubeadm >=1.21 defaults to systemd
+              # kind will implement systemd support in: https://github.com/kubernetes-sigs/kind/issues/1726
+              cgroup-driver: cgroupfs
+              eviction-hard: 'nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%'
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+kind: DockerMachineTemplate
+metadata:
+  name: "my-cluster-class-control-plane"
+spec:
+  template:
+    spec:
+      extraMounts:
+      - containerPath: "/var/run/docker.sock"
+        hostPath: "/var/run/docker.sock"
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+kind: DockerMachineTemplate
+metadata:
+  name: "my-cluster-class-md-0"
+spec:
+  template:
+    spec: {}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
+kind: KubeadmConfigTemplate
+metadata:
+  name: "my-cluster-class-md-0"
+spec:
+  template:
+    spec:
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            # We have to pin the cgroupDriver to cgroupfs as kubeadm >=1.21 defaults to systemd
+            # kind will implement systemd support in: https://github.com/kubernetes-sigs/kind/issues/1726
+            cgroup-driver: cgroupfs
+            eviction-hard: 'nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%'
+

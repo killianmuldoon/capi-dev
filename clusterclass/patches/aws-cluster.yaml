@@ -1,0 +1,21 @@
+apiVersion: cluster.x-k8s.io/v1alpha4
+kind: Cluster
+metadata:
+  name: my-cluster
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks: ["192.168.0.0/16"]
+  topology:
+    class: my-cluster-class
+    version: v1.22.0
+    controlPlane: {}
+    variables:
+    - name: region
+      value: ${AWS_REGION}
+    - name: sshKeyName
+      value: ${AWS_SSH_KEY_NAME}
+    - name: controlPlaneMachineType
+      value: ${AWS_CONTROL_PLANE_MACHINE_TYPE}
+    - name: nodeMachineType
+      value: ${AWS_NODE_MACHINE_TYPE}

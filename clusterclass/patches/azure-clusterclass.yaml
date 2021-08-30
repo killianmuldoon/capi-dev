@@ -1,0 +1,342 @@
+apiVersion: cluster.x-k8s.io/v1alpha4
+kind: ClusterClass
+metadata:
+  name: my-cluster-class
+spec:
+  controlPlane:
+    ref:
+      apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
+      kind: KubeadmControlPlaneTemplate
+      name: my-cluster-class-control-plane
+  infrastructure:
+    ref:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+      kind: AzureClusterTemplate
+      name: my-cluster-class-cluster
+  workers:
+    machineDeployments:
+    - class: default-worker
+      template:
+        bootstrap:
+          ref:
+            kind: KubeadmConfigTemplate
+            apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
+            name: my-cluster-class-md-0
+        infrastructure:
+          ref:
+            kind: AzureMachineTemplate
+            apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+            name: my-cluster-class-md-0
+  variables:
+    definitions:
+    - name: clusterIdentityName
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+          default: cluster-identity
+    - name: location
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+          default: centralus
+    - name: vnetName
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: resourceGroup
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: subscriptionID
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+    - name: sshPublicKeyB64
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+          default: ""
+    - name: controlPlaneMachineType
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+          default: Standard_D2s_v3
+    - name: nodeMachineType
+      required: true
+      schema:
+        openAPIV3Schema:
+          type: string
+          default: Standard_D2s_v3
+  patches:
+  - name: clusterIdentityName
+    definitions:
+    - target:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureClusterTemplate
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/identityRef/name”
+        valueFrom:
+          variable: clusterIdentityName
+  - name: location
+    definitions:
+    - target:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureClusterTemplate
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/location”
+        valueFrom:
+          variable: location
+  - name: vnetName
+    definitions:
+    - target:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureClusterTemplate
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/networkSpec/vnet/name”
+        valueFrom:
+          variable: vnetName
+  - name: resourceGroup
+    definitions:
+    - target:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureClusterTemplate
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/resourceGroup”
+        valueFrom:
+          variable: resourceGroup
+  - name: subscriptionID
+    definitions:
+    - target:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureClusterTemplate
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/subscriptionID”
+        valueFrom:
+          variable: subscriptionID
+  - name: sshPublicKeyB64
+    definitions:
+    - target:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureMachineTemplate
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/sshPublicKey”
+        valueFrom:
+          variable: sshPublicKeyB64
+  - name: controlPlaneMachineType
+    definitions:
+    - target:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureMachineTemplate
+        selector:
+          matchControlPlane: true
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/vmSize”
+        valueFrom:
+          variable: controlPlaneMachineType
+  - name: nodeMachineType
+    definitions:
+    - target:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureMachineTemplate
+        selector:
+          matchMachineDeployments:
+          - default-worker
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/vmSize”
+        valueFrom:
+          variable: nodeMachineType
+  - name: clusterName
+    definitions:
+    - target:
+        apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
+        kind: KubeadmControlPlaneTemplate
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/kubeadmConfigSpec/clusterConfiguration/controllerManager/extraArgs/cluster-name”
+        valueFrom:
+          variable: builtin.cluster.name
+      - op: replace
+        path: “/spec/template/spec/kubeadmConfigSpec/files/0/contentFrom/secret/name”
+        valueFrom:
+          template: "{{ .builtin.cluster.name }}-control-plane-azure-json"
+    - target:
+        apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
+        kind: KubeadmConfigTemplate
+      jsonPatches:
+      - op: replace
+        path: “/spec/template/spec/files/0/contentFrom/secret/name”
+        valueFrom:
+          template: "{{ .builtin.cluster.name }}-md-0-azure-json"
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+kind: AzureClusterTemplate
+metadata:
+  name: my-cluster-class-cluster
+spec:
+  template:
+    spec:
+      identityRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+        kind: AzureClusterIdentity
+        name: REPLACEME
+      location: REPLACEME
+      networkSpec:
+        vnet:
+          name: REPLACEME # previously: ${AZURE_VNET_NAME:=${CLUSTER_NAME}-vnet}
+      resourceGroup: REPLACEME # previously: ${AZURE_RESOURCE_GROUP:=${CLUSTER_NAME}}
+      subscriptionID: REPLACEME
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1alpha4
+kind: KubeadmControlPlane
+metadata:
+  name: my-cluster-class-control-plane
+spec:
+  template:
+    spec:
+      machineTemplate:
+        infrastructureRef:
+          apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+          kind: AzureMachineTemplate
+          name: my-cluster-class-control-plane
+      kubeadmConfigSpec:
+        clusterConfiguration:
+          apiServer:
+            extraArgs:
+              cloud-config: /etc/kubernetes/azure.json
+              cloud-provider: azure
+            extraVolumes:
+            - hostPath: /etc/kubernetes/azure.json
+              mountPath: /etc/kubernetes/azure.json
+              name: cloud-config
+              readOnly: true
+            timeoutForControlPlane: 20m
+          controllerManager:
+            extraArgs:
+              allocate-node-cidrs: "false"
+              cloud-config: /etc/kubernetes/azure.json
+              cloud-provider: azure
+              cluster-name: REPLACEME
+            extraVolumes:
+            - hostPath: /etc/kubernetes/azure.json
+              mountPath: /etc/kubernetes/azure.json
+              name: cloud-config
+              readOnly: true
+          etcd:
+            local:
+              dataDir: /var/lib/etcddisk/etcd
+              extraArgs:
+                quota-backend-bytes: "8589934592"
+        diskSetup:
+          filesystems:
+          - device: /dev/disk/azure/scsi1/lun0
+            extraOpts:
+            - -E
+            - lazy_itable_init=1,lazy_journal_init=1
+            filesystem: ext4
+            label: etcd_disk
+          - device: ephemeral0.1
+            filesystem: ext4
+            label: ephemeral0
+            replaceFS: ntfs
+          partitions:
+          - device: /dev/disk/azure/scsi1/lun0
+            layout: true
+            overwrite: false
+            tableType: gpt
+        files:
+        - contentFrom:
+            secret:
+              key: control-plane-azure.json
+              name: REPLACEME
+          owner: root:root
+          path: /etc/kubernetes/azure.json
+          permissions: "0644"
+        initConfiguration:
+          nodeRegistration:
+            kubeletExtraArgs:
+              azure-container-registry-config: /etc/kubernetes/azure.json
+              cloud-config: /etc/kubernetes/azure.json
+              cloud-provider: azure
+            name: '{{ ds.meta_data["local_hostname"] }}'
+        joinConfiguration:
+          nodeRegistration:
+            kubeletExtraArgs:
+              azure-container-registry-config: /etc/kubernetes/azure.json
+              cloud-config: /etc/kubernetes/azure.json
+              cloud-provider: azure
+            name: '{{ ds.meta_data["local_hostname"] }}'
+        mounts:
+        - - LABEL=etcd_disk
+          - /var/lib/etcddisk
+        postKubeadmCommands: []
+        preKubeadmCommands: []
+      version: v1.22.0
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+kind: AzureMachineTemplate
+metadata:
+  name: my-cluster-class-control-plane
+spec:
+  template:
+    spec:
+      dataDisks:
+      - diskSizeGB: 256
+        lun: 0
+        nameSuffix: etcddisk
+      osDisk:
+        diskSizeGB: 128
+        osType: Linux
+      sshPublicKey: REPLACEME
+      vmSize: REPLACEME
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
+kind: AzureMachineTemplate
+metadata:
+  name: my-cluster-class-md-0
+spec:
+  template:
+    spec:
+      osDisk:
+        diskSizeGB: 128
+        osType: Linux
+      sshPublicKey: REPLACEME
+      vmSize: REPLACEME
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
+kind: KubeadmConfigTemplate
+metadata:
+  name: my-cluster-class-md-0
+spec:
+  template:
+    spec:
+      files:
+      - contentFrom:
+          secret:
+            key: worker-node-azure.json
+            name: REPLACEME
+        owner: root:root
+        path: /etc/kubernetes/azure.json
+        permissions: "0644"
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            azure-container-registry-config: /etc/kubernetes/azure.json
+            cloud-config: /etc/kubernetes/azure.json
+            cloud-provider: azure
+          name: '{{ ds.meta_data["local_hostname"] }}'
+      preKubeadmCommands: []

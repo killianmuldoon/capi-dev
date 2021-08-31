@@ -194,7 +194,7 @@ spec:
         kind: KubeadmConfigTemplate
       jsonPatches:
       - op: replace
-        path: “/spec/template/spec/files/0/contentFrom/secret/name”
+        path: “/spec/template/spec/files”
         valueFrom:
           template: |
             - contentFrom:

@@ -39,12 +39,10 @@ spec:
               names:
               - windows-worker
       jsonPatches:
-      - op: "replace" # add, replace or remove
+      - op: "replace"
         path: "/spec/cpus"
-        # one of value or valueFrom
         value: 1
         valueFrom:
-          # one of variable or template
           variable: cpu
           template: |
             {{ builtin.cluster.name }}

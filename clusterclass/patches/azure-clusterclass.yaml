@@ -146,7 +146,8 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
         kind: AzureMachineTemplate
         selector:
-          matchControlPlane: true
+          matchResources:
+            controlPlane: true
       jsonPatches:
       - op: replace
         path: “/spec/template/spec/vmSize”
@@ -158,8 +159,10 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
         kind: AzureMachineTemplate
         selector:
-          matchMachineDeployments:
-          - default-worker
+          matchResources:
+            machineDeploymentClass:
+              names:
+              - default-worker
       jsonPatches:
       - op: replace
         path: “/spec/template/spec/vmSize”
@@ -176,9 +179,16 @@ spec:
         valueFrom:
           variable: builtin.cluster.name
       - op: replace
-        path: “/spec/template/spec/kubeadmConfigSpec/files/0/contentFrom/secret/name”
+        path: “/spec/template/spec/kubeadmConfigSpec/files”
         valueFrom:
-          template: "{{ .builtin.cluster.name }}-control-plane-azure-json"
+          template: |
+            - contentFrom:
+                secret:
+                  key: control-plane-azure.json
+                  name: "{{ .builtin.cluster.name }}-control-plane-azure-json"
+              owner: root:root
+              path: /etc/kubernetes/azure.json
+              permissions: "0644"
     - target:
         apiVersion: bootstrap.cluster.x-k8s.io/v1alpha4
         kind: KubeadmConfigTemplate
@@ -186,7 +196,14 @@ spec:
       - op: replace
         path: “/spec/template/spec/files/0/contentFrom/secret/name”
         valueFrom:
-          template: "{{ .builtin.cluster.name }}-md-0-azure-json"
+          template: |
+            - contentFrom:
+                secret:
+                  key: worker-node-azure.json
+                  name: "{{ .builtin.cluster.name }}-md-0-azure-json"
+              owner: root:root
+              path: /etc/kubernetes/azure.json
+              permissions: "0644"
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
 kind: AzureClusterTemplate
@@ -263,14 +280,7 @@ spec:
             layout: true
             overwrite: false
             tableType: gpt
-        files:
-        - contentFrom:
-            secret:
-              key: control-plane-azure.json
-              name: REPLACEME
-          owner: root:root
-          path: /etc/kubernetes/azure.json
-          permissions: "0644"
+        files: []
         initConfiguration:
           nodeRegistration:
             kubeletExtraArgs:
@@ -329,14 +339,7 @@ metadata:
 spec:
   template:
     spec:
-      files:
-      - contentFrom:
-          secret:
-            key: worker-node-azure.json
-            name: REPLACEME
-        owner: root:root
-        path: /etc/kubernetes/azure.json
-        permissions: "0644"
+      files: []
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs:

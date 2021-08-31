@@ -48,10 +48,6 @@ spec:
           variable: cpu
           template: |
             {{ builtin.cluster.name }}
-
-
-
-
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha4
 kind: DockerClusterTemplate

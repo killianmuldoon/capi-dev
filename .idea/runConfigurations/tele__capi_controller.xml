@@ -2,7 +2,7 @@
   <configuration default="false" name="tele: capi controller" type="GoApplicationRunConfiguration" factoryName="Go Application" folderName="CAPI">
     <module name="cluster-api" />
     <working_directory value="$PROJECT_DIR$/../cluster-api" />
-    <parameters value="--webhook-cert-dir=$USER_HOME$/telepresence/capi-controller/volumes/tmp/k8s-webhook-server/serving-certs/ --feature-gates=MachinePool=true,ClusterResourceSet=true,ClusterTopology=true" />
+    <parameters value="--webhook-cert-dir=$USER_HOME$/telepresence/capi-controller/volumes/tmp/k8s-webhook-server/serving-certs/ --feature-gates=MachinePool=true,ClusterResourceSet=true,ClusterTopology=true --v=5" />
     <envs>
       <env name="CAPI_MAC_FIX_REST_CONFIG" value="true" />
     </envs>

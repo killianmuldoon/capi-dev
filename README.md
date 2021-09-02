@@ -17,7 +17,7 @@ Patch: [local-controllers.patch](./patches/local-controllers.patch)
 Telepresence:
 
 ```bash
-# TODO: complete cleanup before: telepresence uninstall --everything + quit
+# TODO: Sometimes telepresence does not mount volumes > re-run the following until it works :/
 # Import kubeconfig
 kind_kubeconfig test-<tab>
 # Intercept webhook service (capi, capd, capi-kubeadm-bootstrap, capi-kubeadm-control-plane, capo, capv, capz)

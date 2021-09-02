@@ -37,7 +37,7 @@ k apply -f ./base/cluster-1.yaml
   * delete cluster
 
 TODO:
-* Check if MD templates are deleted after MD deletion (probably not)
+* is MD deleted after it's dropped from the cluster?
 * KCP: check if kubernetesVersion and machineTemplate must be set
 * multiple clusters
 * Same with errors?

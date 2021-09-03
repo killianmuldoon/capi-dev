@@ -54,14 +54,11 @@ TODO:
 
 # Findings    
 
-* topology.controlPlane.metadata is optional but is currently not a pointer (and has no +optional tag)
-
-* control plane machines are named like this: "my-cluster-m4c56-52fjw". I wonder if we want to put something with control-plane in the control plane name
+* optional / required fields:
+  * topology.controlPlane.metadata is optional but is currently not a pointer (and has no +optional tag)
 
 * controlPlane machineInfrastructure must be set twice (ClusterClass + KubeadmControlPlaneTemplate)
     * Previously discussed [here](https://vmware.slack.com/archives/C02940RMBD3/p1628787368113600?thread_ts=1628786625.112900&cid=C02940RMBD3)
 
 * Resource leak: we should probably make sure we never create duplicate resources (at least for InfrastructureCluster and ControlPLane)
     * Might be good to add an additional check (i.e. check if they already exist?) during reconcile (in addition to improving our cleanup behaviour on errors (which is already planned))
-
-* We could block ClusterClass deletion via webhook as long as it's used in Clusters
